@@ -7,10 +7,13 @@ from sqlalchemy import UUID, ForeignKey, Numeric
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.database.base import Base
-from backend.models import User, Product
-from backend.models.payment import Payment
 
-class OrderStatus(PyEnum):
+from backend.models.payment import Payment
+from backend.models.product import Product
+from backend.models.user import User
+
+
+class OrderStatus(str, PyEnum):
     pending = 'pending'
     paid = 'paid'
     cancelled = 'cancelled'
@@ -26,6 +29,6 @@ class Order(Base):
     amount_cents: Mapped[Numeric] = mapped_column()
     created_at: Mapped[datetime] = mapped_column(default=datetime.now)
 
-    user: Mapped["User"] = relationship("User", back_populates="orders")
-    product: Mapped["Product"] = relationship("Product", back_populates="orders")
-    payments: Mapped[List["Payment"]] = relationship("Payment", back_populates="order")
+    user: Mapped[User] = relationship("User", back_populates="orders")
+    product: Mapped[Product] = relationship("Product", back_populates="orders")
+    payments: Mapped[List[Payment]] = relationship("Payment", back_populates="order")

@@ -14,9 +14,9 @@ class Product(Base):
     __tablename__ = "products"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name: Mapped[str] = mapped_column()
+    name: Mapped[str] = mapped_column(nullable=False)
     price_cents: Mapped[Numeric] = mapped_column(default=0)
     created_at: Mapped[datetime] = mapped_column(default=datetime.now)
 
     inventory: Mapped[Inventory] = relationship("Inventory", back_populates="product", uselist=False)
-    orders: Mapped[List["Order"]] = relationship("Order", back_populates="product")
+    orders: Mapped[List[Order]] = relationship("Order", back_populates="product")

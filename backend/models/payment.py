@@ -10,7 +10,7 @@ from enum import Enum as PyEnum
 
 from backend.models.order import Order
 
-class PaymentStatus(PyEnum):
+class PaymentStatus(str, PyEnum):
     pending = 'pending'
     success = 'success'
     failed = 'failed'
@@ -21,7 +21,7 @@ class Payment(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     order_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("orders.id"))
     status: Mapped[PaymentStatus] = mapped_column(default=PaymentStatus.pending)
-    idempotency_key: Mapped[uuid.UUID] = mapped_column(unique=True)
+    idempotency_key: Mapped[uuid.UUID] = mapped_column(unique=True, default=uuid.uuid4)
     created_at: Mapped[datetime] = mapped_column(default=datetime.now)
 
-    order: Mapped["Order"] = relationship("Order", back_populates="payments")
+    order: Mapped[Order] = relationship("Order", back_populates="payments")

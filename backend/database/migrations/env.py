@@ -19,7 +19,11 @@ if DATABASE_URL:
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-from backend.models import *
+from backend.models.user import User
+from backend.models.product import Product
+from backend.models.inventory import Inventory
+from backend.models.order import Order
+from backend.models.payment import Payment
 target_metadata = Base.metadata
 
 def run_migrations_offline() -> None:

@@ -12,9 +12,9 @@ class User(Base):
     __tablename__ = 'users'
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    email: Mapped[str] = mapped_column(unique=True)
+    email: Mapped[str] = mapped_column(unique=True, nullable=False)
     hashed_password: Mapped[str] = mapped_column(nullable=False)
     balance_cents: Mapped[Numeric] = mapped_column(default=0)
     created_at: Mapped[datetime] = mapped_column(default=datetime.now)
 
-    orders: Mapped[List["Order"]] = relationship("Order", back_populates="user")
+    orders: Mapped[List[Order]] = relationship("Order", back_populates="user")
