@@ -3,15 +3,11 @@ from datetime import datetime
 from enum import Enum as PyEnum
 from typing import List
 
-from sqlalchemy import UUID, ForeignKey, Numeric
+from _decimal import Decimal
+from sqlalchemy import UUID, ForeignKey, Numeric, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.database.base import Base
-
-from backend.models.payment import Payment
-from backend.models.product import Product
-from backend.models.user import User
-
 
 class OrderStatus(str, PyEnum):
     pending = 'pending'
@@ -26,9 +22,9 @@ class Order(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
     product_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("products.id"))
     status: Mapped[OrderStatus] = mapped_column(default=OrderStatus.pending)
-    amount_cents: Mapped[Numeric] = mapped_column()
-    created_at: Mapped[datetime] = mapped_column(default=datetime.now)
+    amount_cents: Mapped[int] = mapped_column(nullable=False)
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
 
-    user: Mapped[User] = relationship("User", back_populates="orders")
-    product: Mapped[Product] = relationship("Product", back_populates="orders")
-    payments: Mapped[List[Payment]] = relationship("Payment", back_populates="order")
+    user: Mapped["User"] = relationship("User", back_populates="orders")
+    product: Mapped["Product"] = relationship("Product", back_populates="orders")
+    payments: Mapped[List["Payment"]] = relationship("Payment", back_populates="order")
