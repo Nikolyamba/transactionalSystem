@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -15,9 +16,10 @@ class MakeOrder(BaseModel):
     user_id: uuid.UUID
     product_id: uuid.UUID
     amount_cents: int
+    expired_at: datetime
 
 @o_router.post("")
-async def new_order(data: MakeOrder, db: AsyncSession = Depends(get_db)):
+async def new_order(data: MakeOrder, db: AsyncSession = Depends(get_db)) -> dict:
     async with db.begin():
         result = await db.execute(
             text("""
@@ -38,6 +40,7 @@ async def new_order(data: MakeOrder, db: AsyncSession = Depends(get_db)):
                       product_id = data.product_id,
                       amount_cents=data.amount_cents,
                       status=OrderStatus.pending,
+                      expired_at=datetime.utcnow() + timedelta(minutes=10)
                       )
 
         db.add(order)

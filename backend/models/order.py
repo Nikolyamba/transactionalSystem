@@ -1,10 +1,9 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum as PyEnum
 from typing import List
 
-from _decimal import Decimal
-from sqlalchemy import UUID, ForeignKey, Numeric, func
+from sqlalchemy import UUID, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.database.base import Base
@@ -24,6 +23,7 @@ class Order(Base):
     status: Mapped[OrderStatus] = mapped_column(default=OrderStatus.pending)
     amount_cents: Mapped[int] = mapped_column(nullable=False)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+    expired_at: Mapped[datetime] = mapped_column(nullable=False)
 
     user: Mapped["User"] = relationship("User", back_populates="orders")
     product: Mapped["Product"] = relationship("Product", back_populates="orders")
