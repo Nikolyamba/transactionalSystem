@@ -8,20 +8,22 @@ from backend.database.session import SessionLocal
 def expire_orders():
     db = SessionLocal()
     try:
-        db.execute(text("""
+        result = db.execute(text("""
             UPDATE orders
             SET status = 'expired'
             WHERE status = 'pending'
-            AND expires_at < now()
+            AND expired_at < now()
+            RETURNING product_id
         """))
 
-        db.execute(text("""
-            UPDATE inventories i
-            SET reserved_quantity = reserved_quantity - 1
-            FROM orders o
-            WHERE o.product_id = i.product_id
-            AND o.status = 'expired'
-        """))
+        expired_products = result.fetchall()
+
+        for row in expired_products:
+            db.execute(text("""
+                UPDATE inventories
+                SET reserved_quantity = reserved_quantity - 1
+                WHERE product_id = :product_id
+            """), {"product_id": row.product_id})
 
         db.commit()
     finally:
